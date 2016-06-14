@@ -5,8 +5,11 @@
 import network
 import time
 
-network.call("localhost")
-
+try:
+	network.call("localhost")
+except:
+	print ("NO SERVER FOUND!")
+	
 while network.isConnected():
   print("sending")
   network.say("hello")

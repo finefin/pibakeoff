@@ -5,6 +5,8 @@
 import network
 import time
 
+print ("server try start...")
+
 def heard(phrase):
   print(phrase)
   

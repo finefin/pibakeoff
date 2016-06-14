@@ -25,6 +25,7 @@ def trace(msg):
 # of open sockets, either or both of server and client sockets.
     
 class Connection():
+
   def defaultWhenHungupHandler(self):
     print("CONNECTION LOST")
     self.connected = False
@@ -54,7 +55,9 @@ class Connection():
     
   # client calling server
   def call(self, addr, whenHearCall, port=None):
+    print "call:" + addr
     self.trace("call:" + addr)
+    	
     if (port != None):
       self.port = port
     else:
@@ -68,6 +71,7 @@ class Connection():
   # server waiting for client
   def wait(self, whenHearCall, port=None):
     self.trace("wait")
+    print "wait"
     if (port != None):
       self.port = port
     else:
@@ -82,6 +86,7 @@ class Connection():
       
   def isConnected(self):
     self.trace("isConnected:" + str(self.connected))
+    print "isConnected:" + str(self.connected)
     return self.connected
   
   
@@ -89,6 +94,7 @@ class Connection():
     self.trace("say:" + data)
     if (self.peerHandle == None):
       self.trace("say called hangup")
+      print "say called hangup"
       self.hangUp()
     else:
       if (self.startOfPacket != None):
@@ -183,18 +189,26 @@ def _listenerThreadBody(handle, addr, whenHearFn, hangUpFn=None, packetiser=None
 # intentionally static (non class instanced)
   
 def _clientOpen(addr, port):
-  trace("open:" + addr)
+  #trace("open:" + addr)
+  print "open:" + addr
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   s.connect((addr, port))
   return s  
 
 
 def _serverWait(addr, port):
-  trace("wait connection")
+  #trace("wait connection")
+  print "wait connection"
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  s.bind((addr, port))
-  s.listen(1)
-  return s
+  s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+  	
+  try:
+  	s.bind((addr, port))
+  	s.listen(1)
+  	return s
+  except socket.error as msg:
+	print 'socket.error: Binding failed! [Error ' + str(msg[0]) + ']: ' + msg[1]
+	sys.exit()
   
   
 def _serverAccept(handle):
